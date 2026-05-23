@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UpscaleIt — AI Image Upscaler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0d0d0f;
+  --bg2:     #151518;
+  --bg3:     #1d1d22;
+  --bg4:     #232329;
+  --border:  rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text:    #f0efe8;
+  --muted:   #888880;
+  --accent:  #e8ff47;
+  --accent2: #ff6b35;
+  --green:   #4fffb0;
+  --red:     #ff4f6b;
+  --mono:    'DM Mono', monospace;
+  --display: 'Syne', sans-serif;
+}
+
+html { background: var(--bg); color: var(--text); font-family: var(--display); min-height: 100vh; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(79,255,176,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 90% 90%, rgba(232,255,71,0.04) 0%, transparent 60%),
+    var(--bg);
+}
+
+header {
+  padding: 1.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+.logo span { color: var(--green); }
+.nav-links { display: flex; gap: 1rem; align-items: center; }
+.nav-link {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.04em;
+}
+.nav-link:hover { color: var(--text); border-color: var(--border2); }
+
+main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+.hero { margin-bottom: 2rem; }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 800; line-height: 1.06;
+  letter-spacing: -0.04em; margin-bottom: 0.6rem;
+}
+.hero h1 em { color: var(--green); font-style: normal; }
+.hero p { font-size: 0.85rem; color: var(--muted); font-family: var(--mono); }
+
+/* model warning banner */
+.banner {
+  background: rgba(232,255,71,0.05);
+  border: 1px solid rgba(232,255,71,0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+.banner-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* drop zone */
+.drop-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--bg2);
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--green);
+  background: rgba(79,255,176,0.03);
+}
+.drop-zone input { display: none; }
+.drop-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.drop-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.35rem; }
+.drop-sub { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+
+/* cards */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin-top: 1rem;
+}
+.card.hidden { display: none; }
+.card-title {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+}
+
+/* stats */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+.stat { background: var(--bg3); border-radius: 10px; padding: 10px 12px; }
+.stat-val { font-family: var(--mono); font-size: 1.1rem; font-weight: 500; color: var(--green); }
+.stat-lbl { font-size: 0.68rem; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+
+/* scale selector */
+.scale-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.scale-btn {
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 1rem; cursor: pointer;
+  text-align: center; transition: border-color 0.15s, background 0.15s;
+  color: var(--text); font-family: var(--display);
+}
+.scale-btn:hover { border-color: var(--border2); }
+.scale-btn.active { border-color: var(--green); background: rgba(79,255,176,0.06); }
+.scale-btn .scale-num { font-size: 1.6rem; font-weight: 800; color: var(--green); line-height: 1; margin-bottom: 4px; }
+.scale-btn .scale-lbl { font-size: 0.72rem; color: var(--muted); font-family: var(--mono); }
+.scale-btn .scale-size { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); margin-top: 3px; }
+
+/* backend & format row */
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1rem; }
+@media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } .scale-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+.field label {
+  display: block; font-family: var(--mono); font-size: 0.68rem;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.field select {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-family: var(--mono); font-size: 0.88rem;
+  padding: 8px 10px; outline: none; transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.field select:focus { border-color: var(--green); }
+.field select option { background: var(--bg3); }
+
+/* progress */
+.progress-wrap {
+  background: var(--bg3); border-radius: 10px;
+  overflow: hidden; height: 6px; margin-top: 1rem;
+}
+.progress-bar {
+  height: 100%; background: var(--green);
+  border-radius: 10px; width: 0%;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--muted); margin-top: 6px; text-align: center;
+  min-height: 18px;
+}
+
+/* upscale button */
+.upscale-btn {
+  width: 100%; margin-top: 1rem; padding: 14px;
+  background: var(--green); color: #0d0d0f;
+  font-family: var(--display); font-size: 1rem; font-weight: 800;
+  border: none; border-radius: 12px; cursor: pointer;
+  letter-spacing: -0.02em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.upscale-btn:hover { opacity: 0.88; }
+.upscale-btn:active { transform: scale(0.98); }
+.upscale-btn:disabled { opacity: 0.28; cursor: default; transform: none; }
+
+/* comparison viewer */
+#compare-card { display: none; margin-top: 1rem; animation: fadeUp 0.3s ease both; }
+#compare-card.show { display: block; }
+
+.compare-wrap {
+  position: relative; overflow: hidden;
+  border-radius: 12px; background: var(--bg3);
+  cursor: ew-resize; user-select: none;
+  min-height: 180px;
+}
+.compare-wrap canvas { display: block; max-width: 100%; width: 100%; height: auto; }
+.compare-top {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+.compare-top canvas { position: absolute; top: 0; left: 0; max-width: none; }
+.compare-divider {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: white; cursor: ew-resize; z-index: 10;
+  transform: translateX(-50%);
+}
+.compare-divider::before {
+  content: '◀ ▶';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: white; color: #0d0d0f;
+  font-size: 0.6rem; font-weight: 700;
+  padding: 4px 7px; border-radius: 999px;
+  white-space: nowrap; letter-spacing: 0.06em;
+}
+.compare-label {
+  position: absolute; bottom: 10px;
+  font-family: var(--mono); font-size: 0.65rem;
+  padding: 3px 8px; border-radius: 6px;
+  pointer-events: none; letter-spacing: 0.06em;
+}
+.compare-label.orig { left: 10px; background: rgba(0,0,0,0.7); color: var(--muted); }
+.compare-label.upsc { right: 10px; background: rgba(79,255,176,0.15); color: var(--green); border: 1px solid rgba(79,255,176,0.3); }
+
+.dl-btn {
+  width: 100%; margin-top: 0.75rem; padding: 12px;
+  background: transparent; color: var(--green);
+  font-family: var(--display); font-size: 0.9rem; font-weight: 700;
+  border: 1px solid var(--green); border-radius: 12px; cursor: pointer;
+  letter-spacing: -0.01em; transition: background 0.15s;
+}
+.dl-btn:hover { background: rgba(79,255,176,0.08); }
+
+/* out info row */
+.out-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-top: 1rem; }
+
+footer {
+  text-align: center; padding: 1.75rem;
+  font-family: var(--mono); font-size: 0.68rem;
+  color: var(--muted); border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Upscale<span>It</span></div>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">✂ SliceIt</a>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>AI upscaling,<br><em>in your browser.</em></h1>
+    <p>// Powered by Real-ESRGAN · TensorFlow.js · WebGPU/WebGL · Zero uploads</p>
+  </div>
+
+  <div class="banner">
+    <div class="banner-icon">⚡</div>
+    <div>
+      <strong>First-time model download (~67MB)</strong> — The AI model loads from Hugging Face and is cached in your browser. Subsequent uses are instant. Works best on Chrome/Edge with a dedicated GPU.
+    </div>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()">
+    <input type="file" id="fi" accept="image/*">
+    <div class="drop-icon">🔍</div>
+    <div class="drop-title" id="dz-title">Drop your image here or click to upload</div>
+    <div class="drop-sub" id="dz-sub">PNG · JPG · WebP · Any resolution</div>
+  </div>
+
+  <!-- Image info -->
+  <div class="card hidden" id="info-card">
+    <div class="card-title">// Original image</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="s-w">—</div><div class="stat-lbl">Width px</div></div>
+      <div class="stat"><div class="stat-val" id="s-h">—</div><div class="stat-lbl">Height px</div></div>
+      <div class="stat"><div class="stat-val" id="s-sz">—</div><div class="stat-lbl">File size</div></div>
+      <div class="stat"><div class="stat-val" id="s-out">—</div><div class="stat-lbl">Output size</div></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card hidden" id="settings-card">
+    <div class="card-title">// Upscale settings</div>
+
+    <div class="scale-grid">
+      <button class="scale-btn" id="s2" onclick="setScale(2)">
+        <div class="scale-num">2×</div>
+        <div class="scale-lbl">Standard</div>
+        <div class="scale-size" id="sz2">—</div>
+      </button>
+      <button class="scale-btn active" id="s4" onclick="setScale(4)">
+        <div class="scale-num">4×</div>
+        <div class="scale-lbl">High quality</div>
+        <div class="scale-size" id="sz4">—</div>
+      </button>
+      <button class="scale-btn" id="s8" onclick="setScale(8)">
+        <div class="scale-num">8×</div>
+        <div class="scale-lbl">Ultra</div>
+        <div class="scale-size" id="sz8">—</div>
+      </button>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Backend</label>
+        <select id="backend">
+          <option value="webgpu">WebGPU (fastest — Chrome/Edge)</option>
+          <option value="webgl" selected>WebGL (compatible — all browsers)</option>
+          <option value="wasm">WASM / CPU (slowest, always works)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Output format</label>
+        <select id="fmt">
+          <option value="image/png">PNG — lossless</option>
+          <option value="image/jpeg">JPEG — smaller file</option>
+          <option value="image/webp">WebP — modern</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="prog-wrap" style="display:none">
+      <div class="progress-bar" id="prog-bar"></div>
+    </div>
+    <div class="progress-text" id="prog-text"></div>
+
+    <button class="upscale-btn" id="upscale-btn" disabled onclick="doUpscale()">
+      ✦ Upscale Image
+    </button>
+  </div>
+
+  <!-- Compare output -->
+  <div id="compare-card">
+    <div class="card-title" style="font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:0.75rem;">// Result — drag slider to compare</div>
+
+    <div class="compare-wrap" id="compare-wrap">
+      <canvas id="orig-canvas"></canvas>
+      <div class="compare-top" id="compare-top">
+        <canvas id="out-canvas"></canvas>
+      </div>
+      <div class="compare-divider" id="divider"></div>
+      <div class="compare-label orig">ORIGINAL</div>
+      <div class="compare-label upsc">AI UPSCALED ✦</div>
+    </div>
+
+    <div class="out-info">
+      <div class="stat"><div class="stat-val" id="o-w">—</div><div class="stat-lbl">Output width</div></div>
+      <div class="stat"><div class="stat-val" id="o-h">—</div><div class="stat-lbl">Output height</div></div>
+      <div class="stat"><div class="stat-val" id="o-scale">—</div><div class="stat-lbl">Scale factor</div></div>
+      <div class="stat"><div class="stat-val" id="o-time">—</div><div class="stat-lbl">Time taken</div></div>
+    </div>
+
+    <button class="dl-btn" id="dl-btn" onclick="downloadResult()">↓ Download upscaled image</button>
+  </div>
+</main>
+
+<footer>Real-ESRGAN model by xinntao · TensorFlow.js · 100% client-side · No uploads · No tracking</footer>
+
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+
+<script>
+/* ── state ── */
+let img = null, scale = 4, outputDataUrl = null;
+let modelCache = {};
+
+/* ── drag & drop ── */
+const dz = document.getElementById('dz');
+const fi = document.getElementById('fi');
+fi.onchange = e => loadFile(e.target.files[0]);
+dz.ondragover  = e => { e.preventDefault(); dz.classList.add('over'); };
+dz.ondragleave = () => dz.classList.remove('over');
+dz.ondrop = e => { e.preventDefault(); dz.classList.remove('over'); loadFile(e.dataTransfer.files[0]); };
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(file);
+  const i = new Image();
+  i.onload = () => {
+    img = i;
+    document.getElementById('dz-title').textContent = file.name;
+    document.getElementById('dz-sub').textContent = `${i.naturalWidth} × ${i.naturalHeight} px`;
+    document.getElementById('s-w').textContent = i.naturalWidth;
+    document.getElementById('s-h').textContent = i.naturalHeight;
+    document.getElementById('s-sz').textContent = fmtBytes(file.size);
+    document.getElementById('info-card').classList.remove('hidden');
+    document.getElementById('settings-card').classList.remove('hidden');
+    document.getElementById('upscale-btn').disabled = false;
+    document.getElementById('compare-card').className = '';
+    outputDataUrl = null;
+    updateScaleSizes();
+    setScale(scale);
+  };
+  i.src = url;
+}
+
+function setScale(s) {
+  scale = s;
+  [2, 4, 8].forEach(n => document.getElementById('s'+n).classList.toggle('active', n === s));
+  document.getElementById('s-out').textContent = img
+    ? `${img.naturalWidth * s} × ${img.naturalHeight * s}`
+    : '—';
+}
+
+function updateScaleSizes() {
+  if (!img) return;
+  [2, 4, 8].forEach(n => {
+    document.getElementById('sz'+n).textContent =
+      `→ ${img.naturalWidth*n} × ${img.naturalHeight*n}`;
+  });
+}
+
+/* ── upscale ── */
+async function doUpscale() {
+  if (!img) return;
+  const backend  = document.getElementById('backend').value;
+  const btn      = document.getElementById('upscale-btn');
+  const progWrap = document.getElementById('prog-wrap');
+  const progBar  = document.getElementById('prog-bar');
+  const progText = document.getElementById('prog-text');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Processing…';
+  progWrap.style.display = '';
+  progBar.style.width = '0%';
+  progText.textContent = 'Initializing TensorFlow.js…';
+
+  const t0 = Date.now();
+
+  try {
+    /* set backend */
+    progText.textContent = `Setting up ${backend.toUpperCase()} backend…`;
+    progBar.style.width = '5%';
+
+    try {
+      await tf.setBackend(backend);
+      await tf.ready();
+    } catch(e) {
+      progText.textContent = 'WebGPU unavailable, falling back to WebGL…';
+      await tf.setBackend('webgl');
+      await tf.ready();
+    }
+
+    progText.textContent = `Backend: ${tf.getBackend().toUpperCase()} ✓`;
+    progBar.style.width = '10%';
+
+    /* load model */
+    const modelKey = `realesrgan_x4`; // we always use x4 and scale in canvas if 2x or 8x
+    let model = modelCache[modelKey];
+
+    if (!model) {
+      progText.textContent = 'Downloading AI model from Hugging Face (~67MB, cached after first use)…';
+      progBar.style.width = '15%';
+
+      // Use the xororz tfjs-converted Real-ESRGAN model hosted on HuggingFace
+      const modelUrl = 'https://huggingface.co/xororz/web-realesrgan/resolve/main/realesrgan-x4plus/model.json';
+
+      model = await tf.loadGraphModel(modelUrl, {
+        onProgress: (fraction) => {
+          const pct = 15 + Math.round(fraction * 50);
+          progBar.style.width = pct + '%';
+          progText.textContent = `Downloading model… ${Math.round(fraction * 100)}%`;
+        }
+      });
+      modelCache[modelKey] = model;
+      progText.textContent = 'Model loaded ✓ — Starting upscale…';
+    } else {
+      progText.textContent = 'Model loaded from cache ✓ — Starting upscale…';
+    }
+
+    progBar.style.width = '65%';
+
+    /* process image using tiles */
+    const result = await upscaleWithTiles(img, model, 4, (p, msg) => {
+      progBar.style.width = (65 + Math.round(p * 30)) + '%';
+      progText.textContent = msg;
+    });
+
+    progBar.style.width = '98%';
+    progText.textContent = 'Rendering output…';
+
+    /* if user picked 2x or 8x, resize the 4x output */
+    const finalCanvas = document.createElement('canvas');
+    if (scale === 4) {
+      finalCanvas.width  = result.width;
+      finalCanvas.height = result.height;
+      finalCanvas.getContext('2d').drawImage(result, 0, 0);
+    } else {
+      const targetW = img.naturalWidth  * scale;
+      const targetH = img.naturalHeight * scale;
+      finalCanvas.width  = targetW;
+      finalCanvas.height = targetH;
+      finalCanvas.getContext('2d').drawImage(result, 0, 0, targetW, targetH);
+    }
+
+    const fmt = document.getElementById('fmt').value;
+    outputDataUrl = finalCanvas.toDataURL(fmt, 0.95);
+
+    /* render comparison */
+    renderComparison(img, finalCanvas);
+
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+    document.getElementById('o-w').textContent     = finalCanvas.width;
+    document.getElementById('o-h').textContent     = finalCanvas.height;
+    document.getElementById('o-scale').textContent = scale + '×';
+    document.getElementById('o-time').textContent  = elapsed + 's';
+
+    progBar.style.width = '100%';
+    progText.textContent = `Done! Upscaled in ${elapsed}s using ${tf.getBackend().toUpperCase()}`;
+
+    document.getElementById('compare-card').classList.add('show');
+    document.getElementById('compare-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    console.error(err);
+    progText.textContent = '✗ Error: ' + err.message;
+    progBar.style.background = 'var(--red)';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Upscale Image';
+}
+
+/* ── tile-based processing ── */
+async function upscaleWithTiles(srcImg, model, modelScale, onProgress) {
+  const TILE_SIZE = 128;   // input tile size
+  const OVERLAP   = 16;    // overlap to avoid seam artifacts
+
+  const iw = srcImg.naturalWidth;
+  const ih = srcImg.naturalHeight;
+  const ow = iw * modelScale;
+  const oh = ih * modelScale;
+
+  // Read pixels from source
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width  = iw; srcCanvas.height = ih;
+  const srcCtx = srcCanvas.getContext('2d');
+  srcCtx.drawImage(srcImg, 0, 0);
+  const srcData = srcCtx.getImageData(0, 0, iw, ih);
+
+  // Output canvas
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width  = ow; outCanvas.height = oh;
+  const outCtx = outCanvas.getContext('2d');
+
+  // Compute tiles
+  const tilesX = Math.ceil(iw / TILE_SIZE);
+  const tilesY = Math.ceil(ih / TILE_SIZE);
+  const total  = tilesX * tilesY;
+  let processed = 0;
+
+  for (let ty = 0; ty < tilesY; ty++) {
+    for (let tx = 0; tx < tilesX; tx++) {
+
+      // Source tile bounds (with overlap)
+      const sx  = Math.max(0, tx * TILE_SIZE - OVERLAP);
+      const sy  = Math.max(0, ty * TILE_SIZE - OVERLAP);
+      const sx2 = Math.min(iw, (tx + 1) * TILE_SIZE + OVERLAP);
+      const sy2 = Math.min(ih, (ty + 1) * TILE_SIZE + OVERLAP);
+      const sw  = sx2 - sx;
+      const sh  = sy2 - sy;
+
+      // Extract tile pixels
+      const tileCanvas = document.createElement('canvas');
+      tileCanvas.width  = sw; tileCanvas.height = sh;
+      tileCanvas.getContext('2d').putImageData(
+        srcCtx.getImageData(sx, sy, sw, sh), 0, 0
+      );
+
+      // Run model on tile
+      const tileTensor = tf.tidy(() => {
+        const t = tf.browser.fromPixels(tileCanvas).toFloat().div(255.0);
+        return t.expandDims(0); // [1, H, W, 3]
+      });
+
+      let outTile;
+      try {
+        outTile = await model.executeAsync(tileTensor);
+        if (Array.isArray(outTile)) outTile = outTile[0];
+      } finally {
+        tileTensor.dispose();
+      }
+
+      // Convert output tensor to canvas
+      const tileOutCanvas = document.createElement('canvas');
+      tileOutCanvas.width  = sw * modelScale;
+      tileOutCanvas.height = sh * modelScale;
+
+      const outData = await tf.browser.toPixels(
+        tf.tidy(() => outTile.squeeze().clipByValue(0, 1)),
+        tileOutCanvas
+      );
+      outTile.dispose();
+
+      // Paste tile into output (strip overlap region)
+      const padL = (sx > 0 ? OVERLAP : 0) * modelScale;
+      const padT = (sy > 0 ? OVERLAP : 0) * modelScale;
+      const destX = tx * TILE_SIZE * modelScale;
+      const destY = ty * TILE_SIZE * modelScale;
+      const clipW = Math.min(TILE_SIZE, iw - tx * TILE_SIZE) * modelScale;
+      const clipH = Math.min(TILE_SIZE, ih - ty * TILE_SIZE) * modelScale;
+
+      outCtx.drawImage(
+        tileOutCanvas,
+        padL, padT, clipW, clipH,
+        destX, destY, clipW, clipH
+      );
+
+      processed++;
+      const pct = processed / total;
+      onProgress(pct, `Processing tile ${processed}/${total} (${Math.round(pct*100)}%)…`);
+
+      // Yield to UI
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+
+  return outCanvas;
+}
+
+/* ── comparison slider ── */
+function renderComparison(origImg, outCanvas) {
+  const wrap    = document.getElementById('compare-wrap');
+  const origCvs = document.getElementById('orig-canvas');
+  const outCvs  = document.getElementById('out-canvas');
+  const top     = document.getElementById('compare-top');
+  const divider = document.getElementById('divider');
+
+  // Draw original (scaled to match output dimensions for comparison)
+  origCvs.width  = outCanvas.width;
+  origCvs.height = outCanvas.height;
+  origCvs.getContext('2d').drawImage(origImg, 0, 0, outCanvas.width, outCanvas.height);
+
+  // Draw output
+  outCvs.width  = outCanvas.width;
+  outCvs.height = outCanvas.height;
+  outCvs.getContext('2d').drawImage(outCanvas, 0, 0);
+
+  // CSS scaling so both fit in the container
+  const maxW = wrap.clientWidth || 700;
+  const dispScale = Math.min(maxW / outCanvas.width, 1);
+  const dw = Math.round(outCanvas.width  * dispScale);
+  const dh = Math.round(outCanvas.height * dispScale);
+
+  origCvs.style.width  = dw + 'px';
+  origCvs.style.height = dh + 'px';
+  outCvs.style.width   = dw + 'px';
+  outCvs.style.height  = dh + 'px';
+  wrap.style.height = dh + 'px';
+  top.style.height  = dh + 'px';
+
+  // Init slider at 50%
+  let pct = 50;
+  setDivider(pct, dw);
+
+  // Drag
+  let dragging = false;
+  divider.onmousedown = () => dragging = true;
+  document.onmouseup  = () => dragging = false;
+  document.onmousemove = e => {
+    if (!dragging) return;
+    const rect = wrap.getBoundingClientRect();
+    pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    setDivider(pct, dw);
+  };
+
+  // Touch
+  divider.ontouchstart = e => { e.preventDefault(); dragging = true; };
+  document.ontouchend  = () => dragging = false;
+  document.ontouchmove = e => {
+    if (!dragging) return;
+    const rect = wrap.getBoundingClientRect();
+    pct = Math.max(0, Math.min(100, ((e.touches[0].clientX - rect.left) / rect.width) * 100));
+    setDivider(pct, dw);
+  };
+}
+
+function setDivider(pct, dw) {
+  const px = Math.round(dw * pct / 100);
+  document.getElementById('divider').style.left = px + 'px';
+  document.getElementById('compare-top').style.clipPath =
+    `inset(0 0 0 ${px}px)`;
+  document.getElementById('out-canvas').style.left = `-${px}px`;
+}
+
+/* ── download ── */
+function downloadResult() {
+  if (!outputDataUrl) return;
+  const fmt = document.getElementById('fmt').value;
+  const ext = fmt === 'image/jpeg' ? 'jpg' : fmt === 'image/webp' ? 'webp' : 'png';
+  const a = document.createElement('a');
+  a.href = outputDataUrl;
+  a.download = `upscaled_${scale}x.${ext}`;
+  a.click();
+}
+
+/* ── utils ── */
+function fmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+</script>
+</body>
+</html>
