@@ -25,7 +25,6 @@
 }
 
 html { background: var(--bg); color: var(--text); font-family: var(--display); min-height: 100vh; }
-
 body {
   min-height: 100vh;
   background:
@@ -34,359 +33,173 @@ body {
     var(--bg);
 }
 
+/* ── NAV ── */
 header {
-  padding: 1.5rem 3rem;
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
+  height: 60px;
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,13,15,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
-.logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+.logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); }
 .logo span { color: var(--accent); }
-.badge {
+
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
   font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 4px 10px;
-  border: 1px solid var(--border2);
-  border-radius: 999px;
+  font-size: 0.72rem;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  text-decoration: none;
   color: var(--muted);
-  letter-spacing: 0.06em;
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-tab:hover { color: var(--text); background: var(--bg3); }
+.nav-tab.active {
+  color: #0d0d0f;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 500;
+}
+.nav-tab.active.upscale {
+  background: #4fffb0;
+  border-color: #4fffb0;
 }
 
-main {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 5rem;
-}
+main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
 
 .hero { margin-bottom: 2rem; }
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  font-weight: 800;
-  line-height: 1.06;
-  letter-spacing: -0.04em;
-  margin-bottom: 0.6rem;
-}
+.hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.06; letter-spacing: -0.04em; margin-bottom: 0.6rem; }
 .hero h1 em { color: var(--accent); font-style: normal; }
 .hero p { font-size: 0.85rem; color: var(--muted); font-family: var(--mono); }
 
-/* drop zone */
 .drop-zone {
-  border: 1.5px dashed var(--border2);
-  border-radius: 16px;
-  padding: 3rem 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  background: var(--bg2);
+  border: 1.5px dashed var(--border2); border-radius: 16px;
+  padding: 3rem 2rem; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; background: var(--bg2);
 }
-.drop-zone:hover, .drop-zone.over {
-  border-color: var(--accent);
-  background: rgba(232,255,71,0.03);
-}
+.drop-zone:hover, .drop-zone.over { border-color: var(--accent); background: rgba(232,255,71,0.03); }
 .drop-zone input { display: none; }
 .drop-icon { font-size: 2rem; margin-bottom: 0.75rem; }
 .drop-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.35rem; }
 .drop-sub { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
 
-/* panel */
 .panel { display: none; margin-top: 1.25rem; }
 .panel.visible { display: block; animation: fadeUp 0.28s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem 1.6rem; margin-bottom: 1rem; }
+.card-title { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 1.1rem; }
 
-.card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.4rem 1.6rem;
-  margin-bottom: 1rem;
-}
-
-.card-title {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 1.1rem;
-}
-
-/* stats */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 8px;
-}
-.stat {
-  background: var(--bg3);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+.stat { background: var(--bg3); border-radius: 10px; padding: 10px 12px; }
 .stat-val { font-family: var(--mono); font-size: 1.1rem; font-weight: 500; color: var(--accent); }
 .stat-lbl { font-size: 0.68rem; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
 
-/* mode selector */
-.mode-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
+.mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 520px) { .mode-grid { grid-template-columns: 1fr; } }
-
 .mode-btn {
-  background: var(--bg3);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem 0.75rem;
-  cursor: pointer;
-  text-align: center;
-  transition: border-color 0.15s, background 0.15s;
-  color: var(--text);
-  font-family: var(--display);
+  background: var(--bg3); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 1rem 0.75rem; cursor: pointer; text-align: center;
+  transition: border-color 0.15s, background 0.15s; color: var(--text); font-family: var(--display);
 }
 .mode-btn:hover { border-color: var(--border2); }
 .mode-btn.active { border-color: var(--accent); background: rgba(232,255,71,0.06); }
-.mode-btn .mode-icon {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-/* SVG mode icons */
-.mode-btn svg { display: block; }
+.mode-btn .mode-icon { margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
 .mode-btn .mode-name { font-size: 0.85rem; font-weight: 600; }
 .mode-btn .mode-desc { font-size: 0.68rem; color: var(--muted); font-family: var(--mono); margin-top: 3px; }
 
-/* cut controls */
 .cut-controls { margin-top: 1.1rem; }
-.cut-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 12px;
-}
+.cut-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
 .cut-row:last-child { margin-bottom: 0; }
-.cut-label {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--muted);
-  min-width: 88px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.cut-label span {
-  display: inline-block;
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  margin-right: 6px;
-  vertical-align: middle;
-}
+.cut-label { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); min-width: 88px; text-transform: uppercase; letter-spacing: 0.04em; }
+.cut-label span { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 .cut-label .v-dot { background: var(--accent); }
 .cut-label .h-dot { background: var(--accent2); }
-
-.cut-row input[type=range] {
-  flex: 1; height: 4px; cursor: pointer;
-  appearance: none; -webkit-appearance: none;
-  background: var(--bg4); border-radius: 2px; outline: none;
-}
-.cut-row input[type=range]::-webkit-slider-thumb {
-  appearance: none; width: 16px; height: 16px; border-radius: 50%;
-  cursor: pointer; transition: transform 0.1s;
-}
+.cut-row input[type=range] { flex: 1; height: 4px; cursor: pointer; appearance: none; -webkit-appearance: none; background: var(--bg4); border-radius: 2px; outline: none; }
+.cut-row input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
 #v-slider::-webkit-slider-thumb { background: var(--accent); }
 #h-slider::-webkit-slider-thumb { background: var(--accent2); }
-.cut-row input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.2); }
-
-.cut-num {
-  font-family: var(--mono);
-  font-size: 0.88rem;
-  font-weight: 500;
-  min-width: 60px;
-  text-align: right;
-}
-#v-num { color: var(--accent); }
-#h-num { color: var(--accent2); }
-
-/* number input fallback */
-.cut-row input[type=number] {
-  width: 64px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.9rem;
-  padding: 6px 8px;
-  outline: none;
-  text-align: center;
-}
+.cut-row input[type=number] { width: 56px; background: var(--bg4); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 0.88rem; padding: 5px 8px; outline: none; text-align: center; }
 .cut-row input[type=number]:focus { border-color: var(--accent); }
 
-/* format row */
-.fmt-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 1rem;
-}
+.fmt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 480px) { .fmt-row { grid-template-columns: 1fr; } }
-
-.field label {
-  display: block;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-}
-.field select, .field input[type=number] {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.88rem;
-  padding: 8px 10px;
-  outline: none;
-  transition: border-color 0.15s;
-  -webkit-appearance: none;
-}
+.field label { display: block; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.field select, .field input[type=number] { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 0.88rem; padding: 8px 10px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
 .field select:focus, .field input[type=number]:focus { border-color: var(--accent); }
 .field select option { background: var(--bg3); }
-
 #jq-wrap { display: none; }
 #jq-wrap.show { display: block; }
 .jq-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.jq-row input[type=range] {
-  flex: 1; height: 4px; cursor: pointer;
-  appearance: none; -webkit-appearance: none;
-  background: var(--bg4); border-radius: 2px; outline: none;
-}
-.jq-row input[type=range]::-webkit-slider-thumb {
-  appearance: none; width: 14px; height: 14px; border-radius: 50%;
-  background: var(--text); cursor: pointer;
-}
-.jq-num { font-family: var(--mono); font-size: 0.82rem; color: var(--text); min-width: 32px; text-align: right; }
+.jq-row input[type=range] { flex: 1; height: 4px; cursor: pointer; appearance: none; -webkit-appearance: none; background: var(--bg4); border-radius: 2px; outline: none; }
+.jq-row input[type=range]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--text); cursor: pointer; }
 
-/* preview */
-.preview-box {
-  background: var(--bg3);
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 140px;
-}
+.preview-box { background: var(--bg3); border-radius: 12px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; min-height: 140px; }
 #preview-canvas { max-width: 100%; max-height: 300px; display: block; }
 #grid-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
-
-.tile-hint {
-  font-family: var(--mono);
-  font-size: 0.73rem;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 0.75rem;
-}
+.tile-hint { font-family: var(--mono); font-size: 0.73rem; color: var(--muted); text-align: center; margin-top: 0.75rem; }
 .tile-hint strong { color: var(--accent); }
 .tile-hint b { color: var(--accent2); }
 
-/* slice button */
-.slice-btn {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 14px;
-  background: var(--accent);
-  color: #0d0d0f;
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 800;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  letter-spacing: -0.02em;
-  transition: opacity 0.15s, transform 0.1s;
-}
+.slice-btn { width: 100%; margin-top: 1rem; padding: 14px; background: var(--accent); color: #0d0d0f; font-family: var(--display); font-size: 1rem; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; letter-spacing: -0.02em; transition: opacity 0.15s, transform 0.1s; }
 .slice-btn:hover { opacity: 0.88; }
 .slice-btn:active { transform: scale(0.98); }
 .slice-btn:disabled { opacity: 0.28; cursor: default; transform: none; }
 
-/* output */
 #out-panel { display: none; margin-top: 1.25rem; }
 #out-panel.visible { display: block; animation: fadeUp 0.28s ease both; }
-
-.out-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.9rem;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+.out-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; flex-wrap: wrap; gap: 8px; }
 .out-title { font-size: 0.95rem; font-weight: 600; }
-.dl-all-btn {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 7px 14px;
-  border: 1px solid var(--accent);
-  background: transparent;
-  color: var(--accent);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-  letter-spacing: 0.04em;
-}
+.dl-all-btn { font-family: var(--mono); font-size: 0.72rem; padding: 7px 14px; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; cursor: pointer; transition: background 0.15s; letter-spacing: 0.04em; }
 .dl-all-btn:hover { background: rgba(232,255,71,0.1); }
 .dl-all-btn:disabled { opacity: 0.4; cursor: default; }
-
-.tiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 8px;
-}
-.tile-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.12s;
-}
+.tiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.tile-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.12s; }
 .tile-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .tile-card canvas { display: block; width: 100%; height: auto; }
-.tile-meta {
-  padding: 4px 6px;
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  color: var(--muted);
-  border-top: 1px solid var(--border);
-  text-align: center;
-  line-height: 1.45;
-}
+.tile-meta { padding: 4px 6px; font-family: var(--mono); font-size: 0.62rem; color: var(--muted); border-top: 1px solid var(--border); text-align: center; line-height: 1.45; }
 
-footer {
-  text-align: center;
-  padding: 1.75rem;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  border-top: 1px solid var(--border);
+/* upscale CTA banner */
+.cta-banner {
+  margin-top: 2rem;
+  background: linear-gradient(135deg, rgba(79,255,176,0.07), rgba(79,255,176,0.03));
+  border: 1px solid rgba(79,255,176,0.2);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  flex-wrap: wrap;
 }
+.cta-text .cta-title { font-size: 0.95rem; font-weight: 700; color: #4fffb0; margin-bottom: 4px; }
+.cta-text .cta-sub { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.cta-btn {
+  font-family: var(--display); font-size: 0.85rem; font-weight: 700;
+  padding: 10px 20px; background: #4fffb0; color: #0d0d0f;
+  border: none; border-radius: 10px; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: opacity 0.15s; white-space: nowrap;
+}
+.cta-btn:hover { opacity: 0.85; }
+
+footer { text-align: center; padding: 1.75rem; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); border-top: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Slice<span>It</span></div>
-  <div class="badge">IMAGE SLICER v2.0</div>
+  <a class="logo" href="index.html">Slice<span>It</span></a>
+  <nav class="nav-tabs">
+    <a class="nav-tab active" href="index.html">✂ Slicer</a>
+    <a class="nav-tab upscale" href="upscaler.html">✦ AI Upscaler</a>
+  </nav>
 </header>
 
 <main>
@@ -395,7 +208,6 @@ footer {
     <p>// Upload → Choose cut direction → Download. 100% client-side, nothing leaves your browser.</p>
   </div>
 
-  <!-- Drop zone -->
   <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()">
     <input type="file" id="fi" accept="image/*">
     <div class="drop-icon">✂</div>
@@ -403,10 +215,7 @@ footer {
     <div class="drop-sub" id="dz-sub">PNG · JPG · WebP · BMP · any resolution</div>
   </div>
 
-  <!-- Info + settings -->
   <div class="panel" id="ctrl-panel">
-
-    <!-- Stats -->
     <div class="card">
       <div class="card-title">// Image info</div>
       <div class="stats-row">
@@ -417,14 +226,11 @@ footer {
       </div>
     </div>
 
-    <!-- Cut direction -->
     <div class="card">
       <div class="card-title">// Cut direction</div>
       <div class="mode-grid">
-
         <button class="mode-btn active" id="m-v" onclick="setMode('vertical')">
           <div class="mode-icon">
-            <!-- vertical cuts icon -->
             <svg width="44" height="36" viewBox="0 0 44 36" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="1" y="1" width="42" height="34" rx="4" fill="#1d1d22" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
               <line x1="15" y1="4" x2="15" y2="32" stroke="#e8ff47" stroke-width="1.8" stroke-dasharray="3 2"/>
@@ -434,7 +240,6 @@ footer {
           <div class="mode-name">Vertical</div>
           <div class="mode-desc">Left → Right cuts</div>
         </button>
-
         <button class="mode-btn" id="m-h" onclick="setMode('horizontal')">
           <div class="mode-icon">
             <svg width="44" height="36" viewBox="0 0 44 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -446,7 +251,6 @@ footer {
           <div class="mode-name">Horizontal</div>
           <div class="mode-desc">Top → Bottom cuts</div>
         </button>
-
         <button class="mode-btn" id="m-b" onclick="setMode('both')">
           <div class="mode-icon">
             <svg width="44" height="36" viewBox="0 0 44 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -460,38 +264,26 @@ footer {
           <div class="mode-name">Both</div>
           <div class="mode-desc">Grid (cols × rows)</div>
         </button>
-
       </div>
 
-      <!-- Cut sliders -->
       <div class="cut-controls">
-
-        <!-- Vertical cuts (columns) -->
         <div id="ctrl-v">
           <div class="cut-row">
             <div class="cut-label"><span class="v-dot"></span>Columns</div>
-            <input type="range" id="v-slider" min="2" max="20" value="2"
-              oninput="syncV(this.value)">
-            <input type="number" id="v-num-in" min="2" max="100" value="2"
-              oninput="syncV(this.value)" style="width:56px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:0.88rem;padding:5px 8px;outline:none;text-align:center;">
+            <input type="range" id="v-slider" min="2" max="20" value="2" oninput="syncV(this.value)">
+            <input type="number" id="v-num-in" min="2" max="100" value="2" oninput="syncV(this.value)">
           </div>
         </div>
-
-        <!-- Horizontal cuts (rows) -->
         <div id="ctrl-h" style="display:none">
           <div class="cut-row">
             <div class="cut-label"><span class="h-dot"></span>Rows</div>
-            <input type="range" id="h-slider" min="2" max="20" value="2"
-              oninput="syncH(this.value)">
-            <input type="number" id="h-num-in" min="2" max="100" value="2"
-              oninput="syncH(this.value)" style="width:56px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:0.88rem;padding:5px 8px;outline:none;text-align:center;">
+            <input type="range" id="h-slider" min="2" max="20" value="2" oninput="syncH(this.value)">
+            <input type="number" id="h-num-in" min="2" max="100" value="2" oninput="syncH(this.value)">
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- Format & quality -->
     <div class="card">
       <div class="card-title">// Output format</div>
       <div class="fmt-row">
@@ -506,14 +298,12 @@ footer {
         <div class="field" id="jq-wrap">
           <label>JPEG quality — <span id="jq-val">92</span>%</label>
           <div class="jq-row">
-            <input type="range" min="50" max="100" value="92" id="jq-range"
-              oninput="document.getElementById('jq-val').textContent=this.value">
+            <input type="range" min="50" max="100" value="92" id="jq-range" oninput="document.getElementById('jq-val').textContent=this.value">
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Preview -->
     <div class="card">
       <div class="card-title">// Preview</div>
       <div class="preview-box" id="preview-box">
@@ -526,7 +316,6 @@ footer {
     <button class="slice-btn" id="slice-btn" disabled onclick="doSlice()">✂ Slice Image</button>
   </div>
 
-  <!-- Output -->
   <div id="out-panel">
     <div class="out-header">
       <div class="out-title" id="out-title"></div>
@@ -534,17 +323,24 @@ footer {
     </div>
     <div class="tiles-grid" id="tiles-grid"></div>
   </div>
+
+  <!-- CTA to upscaler -->
+  <div class="cta-banner">
+    <div class="cta-text">
+      <div class="cta-title">✦ Need a higher resolution image?</div>
+      <div class="cta-sub">Use the AI Upscaler to enlarge your image 2×, 4×, or 8× before slicing.</div>
+    </div>
+    <a class="cta-btn" href="upscaler.html">Try AI Upscaler →</a>
+  </div>
 </main>
 
 <footer>Built with Canvas API · 100% client-side · No uploads · No tracking</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-/* ── state ────────────────────────────────── */
 let img = null, mode = 'vertical', tiles = [], fileSz = 0;
 let cols = 2, rows = 2;
 
-/* ── drag & drop ──────────────────────────── */
 const dz = document.getElementById('dz');
 const fi = document.getElementById('fi');
 fi.onchange = e => loadFile(e.target.files[0]);
@@ -573,7 +369,12 @@ function loadFile(file) {
   i.src = url;
 }
 
-/* ── mode selector ────────────────────────── */
+function fmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
 function setMode(m) {
   mode = m;
   ['vertical','horizontal','both'].forEach(k => {
@@ -584,7 +385,6 @@ function setMode(m) {
   refresh();
 }
 
-/* ── sync sliders ↔ number inputs ────────── */
 function syncV(val) {
   val = Math.max(2, Math.min(100, parseInt(val)||2));
   cols = val;
@@ -600,29 +400,23 @@ function syncH(val) {
   refresh();
 }
 
-/* ── format change ────────────────────────── */
 function fmtChange() {
   const isJpeg = document.getElementById('fmt').value === 'image/jpeg';
   document.getElementById('jq-wrap').className = isJpeg ? 'field show' : 'field';
 }
 
-/* ── refresh preview ─────────────────────── */
 function refresh() {
   if (!img) return;
   const c = (mode === 'horizontal') ? 1 : cols;
   const r = (mode === 'vertical')   ? 1 : rows;
-  const total = c * r;
-  document.getElementById('s-t').textContent = total;
-
+  document.getElementById('s-t').textContent = c * r;
   const tw = Math.floor(img.naturalWidth  / c);
   const th = Math.floor(img.naturalHeight / r);
-
   let hint = '';
   if (mode === 'vertical')   hint = `<strong>${c} columns</strong> → each tile: <strong>${tw} × ${img.naturalHeight} px</strong>`;
   if (mode === 'horizontal') hint = `<b>${r} rows</b> → each tile: <strong>${img.naturalWidth} × ${th} px</strong>`;
-  if (mode === 'both')       hint = `<strong>${c} cols</strong> × <b>${r} rows</b> = <strong>${total} tiles</strong>, each <strong>${tw} × ${th} px</strong>`;
+  if (mode === 'both')       hint = `<strong>${c} cols</strong> × <b>${r} rows</b> = <strong>${c*r} tiles</strong>, each <strong>${tw} × ${th} px</strong>`;
   document.getElementById('tile-hint').innerHTML = hint;
-
   drawPreview(c, r);
 }
 
@@ -633,36 +427,25 @@ const gridOvl = document.getElementById('grid-overlay');
 function drawPreview(c, r) {
   const box   = document.getElementById('preview-box');
   const maxW  = box.clientWidth  || 700;
-  const maxH  = 300;
-  const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+  const scale = Math.min(maxW / img.naturalWidth, 300 / img.naturalHeight, 1);
   const dw    = Math.round(img.naturalWidth  * scale);
   const dh    = Math.round(img.naturalHeight * scale);
-  prevCvs.width  = dw;
-  prevCvs.height = dh;
+  prevCvs.width  = dw; prevCvs.height = dh;
   prevCtx.drawImage(img, 0, 0, dw, dh);
-
   let lines = '';
-  if (c > 1) {
-    for (let ci = 1; ci < c; ci++) {
-      const x = Math.round(ci * dw / c);
-      lines += `<line x1="${x}" y1="0" x2="${x}" y2="${dh}"
-        stroke="#e8ff47" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.9"/>`;
-    }
+  if (c > 1) for (let ci = 1; ci < c; ci++) {
+    const x = Math.round(ci * dw / c);
+    lines += `<line x1="${x}" y1="0" x2="${x}" y2="${dh}" stroke="#e8ff47" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.9"/>`;
   }
-  if (r > 1) {
-    for (let ri = 1; ri < r; ri++) {
-      const y = Math.round(ri * dh / r);
-      lines += `<line x1="0" y1="${y}" x2="${dw}" y2="${y}"
-        stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.9"/>`;
-    }
+  if (r > 1) for (let ri = 1; ri < r; ri++) {
+    const y = Math.round(ri * dh / r);
+    lines += `<line x1="0" y1="${y}" x2="${dw}" y2="${y}" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.9"/>`;
   }
   gridOvl.setAttribute('viewBox', `0 0 ${dw} ${dh}`);
-  gridOvl.setAttribute('width',  dw);
-  gridOvl.setAttribute('height', dh);
+  gridOvl.setAttribute('width', dw); gridOvl.setAttribute('height', dh);
   gridOvl.innerHTML = lines;
 }
 
-/* ── slice ────────────────────────────────── */
 function doSlice() {
   if (!img) return;
   const c   = (mode === 'horizontal') ? 1 : cols;
@@ -672,58 +455,45 @@ function doSlice() {
   const ext = fmt === 'image/jpeg' ? 'jpg' : fmt === 'image/webp' ? 'webp' : 'png';
   const iw  = img.naturalWidth, ih = img.naturalHeight;
   const tw  = Math.floor(iw / c), th = Math.floor(ih / r);
-
   tiles = [];
   const grid = document.getElementById('tiles-grid');
   grid.innerHTML = '';
-
   let idx = 0;
   for (let ri = 0; ri < r; ri++) {
     for (let ci = 0; ci < c; ci++) {
       const ox = ci * tw, oy = ri * th;
       const aw = (ci === c - 1) ? iw - ox : tw;
       const ah = (ri === r - 1) ? ih - oy : th;
-
       const tc = document.createElement('canvas');
       tc.width = aw; tc.height = ah;
       tc.getContext('2d').drawImage(img, ox, oy, aw, ah, 0, 0, aw, ah);
       const dataUrl = tc.toDataURL(fmt, q);
       const name    = `tile_${String(idx+1).padStart(2,'0')}_r${ri+1}c${ci+1}.${ext}`;
       tiles.push({ dataUrl, name });
-
       const card = document.createElement('div');
       card.className = 'tile-card';
       card.title = `${aw}×${ah}px — click to download`;
-
-      const mini  = document.createElement('canvas');
-      const ms    = Math.min(140/aw, 100/ah, 1);
-      mini.width  = Math.round(aw * ms);
-      mini.height = Math.round(ah * ms);
+      const mini = document.createElement('canvas');
+      const ms   = Math.min(140/aw, 100/ah, 1);
+      mini.width  = Math.round(aw * ms); mini.height = Math.round(ah * ms);
       mini.getContext('2d').drawImage(tc, 0, 0, mini.width, mini.height);
-
-      const meta  = document.createElement('div');
+      const meta = document.createElement('div');
       meta.className = 'tile-meta';
       meta.innerHTML = `r${ri+1} c${ci+1}<br>${aw}×${ah}`;
-
-      card.appendChild(mini);
-      card.appendChild(meta);
+      card.appendChild(mini); card.appendChild(meta);
       card.onclick = (function(d,n){ return () => dlOne(d,n); })(dataUrl, name);
       grid.appendChild(card);
       idx++;
     }
   }
-
-  document.getElementById('out-title').textContent =
-    `${tiles.length} tile${tiles.length > 1 ? 's' : ''} ready — click any to download`;
+  document.getElementById('out-title').textContent = `${tiles.length} tile${tiles.length > 1 ? 's' : ''} ready — click any to download`;
   const op = document.getElementById('out-panel');
   op.classList.add('visible');
   op.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ── downloads ────────────────────────────── */
 function dlOne(dataUrl, name) {
-  const a = document.createElement('a');
-  a.href = dataUrl; a.download = name; a.click();
+  const a = document.createElement('a'); a.href = dataUrl; a.download = name; a.click();
 }
 
 async function dlAll() {
@@ -735,13 +505,6 @@ async function dlAll() {
   const blob = await zip.generateAsync({ type: 'blob' });
   dlOne(URL.createObjectURL(blob), 'sliceit_tiles.zip');
   btn.textContent = '↓ Download all (ZIP)'; btn.disabled = false;
-}
-
-/* ── utils ────────────────────────────────── */
-function fmtBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
-  return (b/1048576).toFixed(1) + ' MB';
 }
 </script>
 </body>
